@@ -18,7 +18,7 @@ export class AppService {
         status: 'error',
       };
     }
-    const targetPath = path.resolve(__dirname, '../../ju-front');
+    const targetPath = path.resolve(__dirname, process.env.TARGET_DIR);
     try {
       process.chdir(targetPath);
       // Enter your command here
