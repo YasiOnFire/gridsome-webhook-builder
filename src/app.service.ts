@@ -27,7 +27,7 @@ export class AppService {
       child.stdout.setEncoding('utf8');
       child.stdout.on('data', (data) => {
         const response = data.toString();
-        if (response.indexOf('Done') > -1) { this.isBuilding = false; }
+        if (response.indexOf('Done') > -1 || response.indexOf('Error') > -1) { this.isBuilding = false; }
         this.logger.log(response);
       });
     } catch (err) {
