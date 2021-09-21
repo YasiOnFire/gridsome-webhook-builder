@@ -1,6 +1,7 @@
 import { Injectable, Logger, Inject, LoggerService } from '@nestjs/common';
 import { spawn } from 'child_process';
 import * as path from 'path';
+import * as fs from 'fs';
 @Injectable()
 export class AppService {
   private isBuilding: boolean = false;
@@ -21,6 +22,14 @@ export class AppService {
     const targetPath = path.resolve(__dirname, process.env.TARGET_DIR);
     try {
       process.chdir(targetPath);
+
+      if (!fs.existsSync(path.resolve(targetPath, 'package.json'))) {
+        return {
+          message: 'package.json does not exist',
+          status: 'error',
+        };
+      }
+
       // Enter your command here
       const child = spawn('npm', ['run', 'build'], { shell: true });
       this.isBuilding = true;
