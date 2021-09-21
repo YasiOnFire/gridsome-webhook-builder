@@ -36,7 +36,10 @@ yarn run start:dev
 Change `NODE_ENV` to `production` in `.env` and run:
 
 ```bash
-yarn run build && yarn run start:prod
+yarn run build
+```
+```bash
+yarn run start:prod # or pm2 start dist/main.js --time --watch
 ```
 
 ### Using Sentry
