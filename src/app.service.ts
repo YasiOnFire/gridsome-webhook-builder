@@ -1,7 +1,7 @@
-import { Injectable, Logger, Inject, LoggerService } from '@nestjs/common';
+import { Inject, Injectable, Logger, LoggerService } from '@nestjs/common';
 import { spawn } from 'child_process';
-import * as path from 'path';
 import * as fs from 'fs';
+import * as path from 'path';
 @Injectable()
 export class AppService {
   private isBuilding: boolean = false;
@@ -36,7 +36,12 @@ export class AppService {
       child.stdout.setEncoding('utf8');
       child.stdout.on('data', (data) => {
         const response = data.toString();
-        if (response.indexOf('Done') > -1 || response.indexOf('Error') > -1) { this.isBuilding = false; }
+        if (response.indexOf('Done') > -1 || response.indexOf('Error') > -1) {
+          this.isBuilding = false;
+        }
+        if (response.toLowerCase().indexOf('error') > -1) {
+          this.logger.error(response);
+        }
         this.logger.log(response);
       });
     } catch (err) {
