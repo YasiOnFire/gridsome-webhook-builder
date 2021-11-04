@@ -20,6 +20,7 @@ export class AppService {
       };
     }
     const targetPath = path.resolve(__dirname, process.env.TARGET_DIR);
+    const destPath = path.resolve(__dirname, process.env.DESTINATION);
     const cdnPath = path.resolve(__dirname, '../cdn');
     try {
       process.chdir(targetPath);
@@ -41,15 +42,17 @@ export class AppService {
         const response = data.toString();
         if (response.indexOf('Done') > -1 || response.indexOf('Error') > -1) {
           this.isBuilding = false;
+          this.copyDir(path.resolve(targetPath, './dist'), destPath);
           fs.copyFileSync(`${cdnPath}/deployed.png`, `${cdnPath}/status.png`);
         }
         if (response.toLowerCase().indexOf('error') > -1) {
+          fs.copyFileSync(`${cdnPath}/error.png`, `${cdnPath}/status.png`);
           this.logger.error(response);
         }
         this.logger.log(response);
       });
     } catch (err) {
-      fs.copyFileSync(`${cdnPath}/none.png`, `${cdnPath}/status.png`);
+      fs.copyFileSync(`${cdnPath}/error.png`, `${cdnPath}/status.png`);
       this.logger.error(err);
       return {
         message: err,
@@ -59,5 +62,20 @@ export class AppService {
 
     this.logger.log('building website');
     return { status: 'building triggered', time: new Date()};
+  }
+  copyDir(targetPath: string, destPath: string) {
+    const files = fs.readdirSync(targetPath);
+    files.forEach((file) => {
+      const targetFile = path.join(targetPath, file);
+      const destFile = path.join(destPath, file);
+      if (fs.lstatSync(targetFile).isDirectory()) {
+        if (!fs.existsSync(destFile)) {
+          fs.mkdirSync(destFile);
+        }
+        this.copyDir(targetFile, destFile);
+      } else {
+        fs.copyFileSync(targetFile, destFile);
+      }
+    });
   }
 }
